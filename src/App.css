@@ -1,0 +1,273 @@
+/* 전체 레이아웃 */
+.app-container {
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+/* 헤더 스타일 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-icon {
+  font-size: 24px;
+  margin-right: 10px;
+  color: #6c63ff;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-name {
+  font-weight: bold;
+}
+
+.user-country {
+  font-size: 12px;
+  color: #777;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 240px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.sidebar-item {
+  position: relative;
+}
+
+.sidebar-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.sidebar-button:hover {
+  background-color: #ececec;
+}
+
+.sidebar-button.active {
+  background-color: #6c63ff;
+  color: white;
+}
+
+.help-box {
+  margin-top: auto;
+  text-align: center;
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.search-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: white;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #45a049;
+}
+
+/* 선택 영역 컨테이너 */
+.selection-container {
+  position: absolute;
+  top: 0;
+  left: 240px;
+  width: 550px;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 100;
+}
+
+/* 목적변수 선택 */
+.target-variable-selection {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.target-variable-selection h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #4a4a4a;
+}
+
+.target-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.target-buttons .button {
+  flex: 1;
+  margin: 0 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.target-buttons .button:hover {
+  background-color: #f9f9f9;
+}
+
+.target-buttons .button.selected {
+  background-color: #6c63ff;
+  color: white;
+  border: 1px solid #6c63ff;
+}
+
+/* 정책변수 선택 */
+.policy-variable-selection {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.policy-variable-selection h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #4a4a4a;
+}
+
+.policy-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.policy-buttons .button {
+  flex: 1;
+  margin: 0 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.policy-buttons .button:hover {
+  background-color: #f1f1f1;
+}
+
+.policy-buttons .button.selected {
+  background-color: #6c63ff;
+  color: white;
+}
+
+/* 입력 폼 */
+.policy-input {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.policy-input input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 200px;
+  text-align: center;
+}
+
+.submit-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #5948d6;
+}
+
+/* 콘텐츠 영역 */
+.content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-content {
+  font-size: 18px;
+  color: #888;
+  text-align: center;
+}
