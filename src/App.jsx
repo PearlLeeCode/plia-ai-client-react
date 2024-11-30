@@ -20,6 +20,19 @@ function App() {
   const [chartData, setChartData] = useState([]); // 그래프 데이터 상태
   const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
+  // 목적변수와 정책변수 옵션 설정
+  const targetVariableOptions = [
+    { label: "합계 출산율", value: "합계출산율" },
+    { label: "고령화 비율", value: "고령화비율" },
+    { label: "노동 인구 비율", value: "노동인구비율" },
+  ];
+
+  const policyVariableOptions = [
+    { label: "출산 장려금", value: "첫째아이 평균 출산장려금(KRW)" },
+    { label: "양육비 보조금", value: "양육비보조금" },
+    { label: "육아 휴직 지원금", value: "육아휴직급여 상한액(KRW)" },
+  ];
+
   // 정책 변수 값 제출 및 API 호출
   const handlePolicySubmit = async () => {
     if (
@@ -36,19 +49,22 @@ function App() {
 
     // 요청 바디 구성
     const requestBody = {
-      future_childbirth_grant: parseFloat(policyValue),
+      target_variable_name: selectedTargetVariable.value,
+      policy_variable_name: selectedPolicyVariable.value,
+      policy_value: parseFloat(policyValue),
       prediction_years: selectedYear,
     };
 
     try {
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch("http://localhost:8000/simulation/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -56,7 +72,7 @@ function App() {
       setStep(5); // 그래프를 표시하는 단계로 이동
     } catch (error) {
       console.error("Error:", error);
-      alert("데이터를 불러오는데 실패하였습니다.");
+      alert(error.message || "데이터를 불러오는데 실패하였습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -67,12 +83,12 @@ function App() {
     if (predictionData) {
       const historicalData = predictionData.historical_data.map((item) => ({
         date: item.date,
-        historicalValue: item.total_fertility_rate,
+        historicalValue: item.value,
         predictedMean: null,
         quantile_30: null,
         quantile_70: null,
       }));
-  
+
       const predictionDataArray = predictionData.predictions.map((item) => ({
         date: item.date,
         historicalValue: null,
@@ -80,11 +96,11 @@ function App() {
         quantile_30: item.quantile_30,
         quantile_70: item.quantile_70,
       }));
-  
+
       // 마지막 과거 값과 첫 번째 예측 값 찾기
       const lastHistoricalData = historicalData[historicalData.length - 1];
       const firstPredictionData = predictionDataArray[0];
-  
+
       // 과거 데이터와 예측 데이터 사이에 연결점 추가
       const connectingPoint = {
         date: firstPredictionData.date,
@@ -93,13 +109,13 @@ function App() {
         quantile_30: lastHistoricalData.historicalValue,
         quantile_70: lastHistoricalData.historicalValue,
       };
-  
+
       const combinedData = [
         ...historicalData,
         connectingPoint,
         ...predictionDataArray,
       ];
-  
+
       setChartData(combinedData);
     }
   }, [predictionData]);
@@ -121,7 +137,7 @@ function App() {
       alert("정책변수와 값을 선택해야 합니다.");
       return;
     }
-    
+
     // 버튼 텍스트 변경
     setStep(3); // selection-container 닫기
 
@@ -151,9 +167,9 @@ function App() {
               onClick={() => setStep(2)}
             >
               {selectedTargetVariable && selectedYear
-                ? `목적변수: ${selectedTargetVariable}: ${selectedYear}년`
+                ? `목적변수: ${selectedTargetVariable.label}: ${selectedYear}년`
                 : selectedTargetVariable
-                ? `목적변수: ${selectedTargetVariable}`
+                ? `목적변수: ${selectedTargetVariable.label}`
                 : "목적변수를 선택하세요"}
             </button>
             {step === 2 && (
@@ -161,19 +177,20 @@ function App() {
                 <div className="target-variable-selection">
                   <h2>목적변수를 선택하세요</h2>
                   <div className="target-buttons">
-                    {["합계 출산율", "고령화 비율", "노동 인구 비율"].map(
-                      (variable) => (
-                        <button
-                          key={variable}
-                          className={`button ${
-                            selectedTargetVariable === variable ? "selected" : ""
-                          }`}
-                          onClick={() => setSelectedTargetVariable(variable)}
-                        >
-                          {variable}
-                        </button>
-                      )
-                    )}
+                    {targetVariableOptions.map((variable) => (
+                      <button
+                        key={variable.value}
+                        className={`button ${
+                          selectedTargetVariable &&
+                          selectedTargetVariable.value === variable.value
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedTargetVariable(variable)}
+                      >
+                        {variable.label}
+                      </button>
+                    ))}
                   </div>
                   {/* 년도 버튼 */}
                   {selectedTargetVariable && (
@@ -204,7 +221,7 @@ function App() {
               onClick={() => setStep(4)}
             >
               {selectedPolicyVariable
-                ? `정책변수: ${selectedPolicyVariable}: ${policyValue}`
+                ? `정책변수: ${selectedPolicyVariable.label}: ${policyValue}`
                 : "정책변수를 선택하세요"}
             </button>
             {step === 4 && (
@@ -212,32 +229,36 @@ function App() {
                 <div className="policy-variable-selection">
                   <h2>정책변수를 선택하세요</h2>
                   <div className="policy-buttons">
-                    {["출산 장려금", "양육비 보조금", "육아 휴직 지원금"].map(
-                      (policy) => (
-                        <button
-                          key={policy}
-                          className={`button ${
-                            selectedPolicyVariable === policy ? "selected" : ""
-                          }`}
-                          onClick={() => handlePolicySelection(policy)}
-                        >
-                          {policy}
-                        </button>
-                      )
-                    )}
+                    {policyVariableOptions.map((policy) => (
+                      <button
+                        key={policy.value}
+                        className={`button ${
+                          selectedPolicyVariable &&
+                          selectedPolicyVariable.value === policy.value
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() => handlePolicySelection(policy)}
+                      >
+                        {policy.label}
+                      </button>
+                    ))}
                   </div>
                   {/* 정책변수 값 입력 폼 */}
                   {selectedPolicyVariable && (
                     <div className="policy-input">
-                      <h3>{selectedPolicyVariable}</h3>
+                      <h3>{selectedPolicyVariable.label}</h3>
                       <p>선택한 정책변수에 대한 값을 입력하세요.</p>
                       <input
                         type="number"
-                        placeholder="만원 단위로 입력하세요"
+                        placeholder="숫자 값을 입력하세요"
                         value={policyValue}
                         onChange={(e) => setPolicyValue(e.target.value)}
                       />
-                      <button className="submit-button" onClick={handlePolicyValueSubmit}>
+                      <button
+                        className="submit-button"
+                        onClick={handlePolicyValueSubmit}
+                      >
                         시작하기
                       </button>
                     </div>
