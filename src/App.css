@@ -179,6 +179,38 @@
   border: 1px solid #6c63ff;
 }
 
+/* 년도 선택 */
+.year-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.year-buttons .button {
+  flex: 1;
+  margin: 0 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.year-buttons .button:hover {
+  background-color: #f9f9f9;
+}
+
+.year-buttons .button.selected {
+  background-color: #6c63ff;
+  color: white;
+  border: 1px solid #6c63ff;
+}
+
 /* 정책변수 선택 */
 .policy-variable-selection {
   max-width: 700px;
