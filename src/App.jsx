@@ -18,6 +18,7 @@ function App() {
   const [policyValue, setPolicyValue] = useState(""); // 정책 변수 값
   const [predictionData, setPredictionData] = useState(null); // 예측 데이터 상태
   const [chartData, setChartData] = useState([]); // 그래프 데이터 상태
+  const [insights, setInsights] = useState(""); // 분석 내용 상태
   const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
   // 목적변수와 정책변수 옵션 설정
@@ -62,13 +63,14 @@ function App() {
         body: JSON.stringify(requestBody),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
       setPredictionData(data);
+      setInsights(data.insights); // insights 상태에 저장
       setStep(5); // 그래프를 표시하는 단계로 이동
     } catch (error) {
       console.error("Error:", error);
@@ -256,10 +258,11 @@ function App() {
                         onChange={(e) => setPolicyValue(e.target.value)}
                       />
                       <button
-                        className="submit-button"
+                        className={`submit-button ${isLoading ? "loading" : ""}`}
                         onClick={handlePolicyValueSubmit}
+                        disabled={isLoading}
                       >
-                        시작하기
+                        {isLoading ? "시작하는 중..." : "시작하기"}
                       </button>
                     </div>
                   )}
@@ -274,39 +277,45 @@ function App() {
               <p>데이터를 불러오는 중입니다...</p>
             </div>
           ) : predictionData ? (
-            <div className="chart-container">
-              <LineChart width={800} height={400} data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="historicalValue"
-                  stroke="#8884d8"
-                  name="과거 데이터"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="predictedMean"
-                  stroke="#82ca9d"
-                  name="예측 평균"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="quantile_30"
-                  stroke="#ffc658"
-                  name="30% 분위"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="quantile_70"
-                  stroke="#ff7300"
-                  name="70% 분위"
-                />
-              </LineChart>
-            </div>
+            <>
+              <div className="insights-container">
+                <h2>분석 결과</h2>
+                <div className="chart-container">
+                  <LineChart width={800} height={400} data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="historicalValue"
+                      stroke="#8884d8"
+                      name="과거 데이터"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="predictedMean"
+                      stroke="#82ca9d"
+                      name="예측 평균"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="quantile_30"
+                      stroke="#ffc658"
+                      name="30% 분위"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="quantile_70"
+                      stroke="#ff7300"
+                      name="70% 분위"
+                    />
+                  </LineChart>
+                </div>
+                <pre>{insights}</pre>
+              </div>
+            </>
           ) : (
             <div className="empty-content">
               <p>선택한 데이터가 여기에 표시됩니다.</p>
